@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opening Course...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container { max-width: 400px; }
+        h1 { font-size: 24px; margin: 0 0 20px 0; }
+        .loader {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Opening Course...</h1>
+        <div class="loader"></div>
+        <p id="status">Please wait while we open the app</p>
+        <a href="#" id="storeLink" class="button" style="display:none;">
+            Download App
+        </a>
+    </div>
+
+    <script>
+        // Get course ID from URL: ?id=abc123
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('id');
+        
+        if (!courseId) {
+            document.getElementById('status').textContent = 'Invalid link - No course ID found';
+        } else {
+            console.log('Course ID:', courseId);
+            
+            // Try to open app with deep link
+            const appLink = `flutteredu://course/${courseId}`;
+            const playStoreLink = `https://play.google.com/store/apps/details?id=com.example.flutter_education`;
+            
+            // Update Play Store button
+            document.getElementById('storeLink').href = playStoreLink;
+            
+            // Try to open the app
+            window.location.href = appLink;
+            
+            // After 2.5 seconds, assume app didn't open
+            setTimeout(function() {
+                document.getElementById('status').textContent = 'App not installed?';
+                document.querySelector('.loader').style.display = 'none';
+                document.getElementById('storeLink').style.display = 'inline-block';
+                
+                // Auto-redirect to Play Store after 1 more second
+                setTimeout(function() {
+                    window.location.href = playStoreLink;
+                }, 1500);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
