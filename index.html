@@ -6,130 +6,92 @@
     <title>Opening Course...</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
         .container {
             text-align: center;
-            padding: 2rem;
-            max-width: 400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
         }
-        .icon {
-            font-size: 64px;
-            margin-bottom: 1rem;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 0.5rem;
-        }
-        p {
-            opacity: 0.9;
-            margin-bottom: 1rem;
-        }
-        .btn {
-            display: inline-block;
-            background: white;
-            color: #667eea;
-            padding: 12px 32px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 1rem;
-            transition: transform 0.2s;
-        }
-        .btn:hover {
-            transform: scale(1.05);
-        }
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.3);
+        .loader {
+            border: 5px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top: 3px solid white;
-            width: 40px;
-            height: 40px;
+            border-top: 5px solid white;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 2rem auto;
+            margin: 20px auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .info {
+        .message {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        .sub-message {
             font-size: 14px;
             opacity: 0.8;
-            margin-top: 1rem;
+            margin-top: 10px;
+        }
+        .store-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .store-btn:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="icon">🎓</div>
-        <h1 id="title">Opening Course...</h1>
-        <p id="status">Redirecting to app...</p>
-        <div class="spinner" id="spinner"></div>
-        <a href="#" id="openAppBtn" class="btn" style="display:none;">Open in App</a>
-        <p class="info" id="info" style="display:none;">App not installed? You'll need to install it first.</p>
+        <div class="loader"></div>
+        <div class="message">Opening Course...</div>
+        <div class="sub-message" id="subMessage">Launching app</div>
+        <a href="#" id="storeLink" class="store-btn" style="display: none;">
+            Download App
+        </a>
     </div>
 
     <script>
-        // Get course ID from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('id');
-        
-        // Replace with your actual package name
-        const ANDROID_PACKAGE = 'com.example.fluttereducation';  // ⚠️ REPLACE THIS
-        
-        if (!courseId) {
-            document.getElementById('title').textContent = 'Invalid Link';
-            document.getElementById('status').textContent = 'Course ID not found';
-            document.getElementById('spinner').style.display = 'none';
-        } else {
-            const isAndroid = /Android/i.test(navigator.userAgent);
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            
-            function tryOpenApp() {
-                if (isAndroid) {
-                    // Android: Use intent URL (works better from web)
-                    const intentUrl = `intent://course/${courseId}#Intent;` +
-                        `scheme=flutteredu;` +
-                        `package=${ANDROID_PACKAGE};` +
-                        `end;`;
-                    
-                    window.location.href = intentUrl;
-                    
-                } else if (isIOS) {
-                    // iOS: Use custom scheme
-                    window.location.href = `flutteredu://course/${courseId}`;
-                    
-                } else {
-                    // Desktop or unknown
-                    window.location.href = `flutteredu://course/${courseId}`;
-                }
-            }
-            
-            // Try to open app immediately
-            tryOpenApp();
-            
-            // After 2 seconds, show manual open button
+
+        if (courseId) {
+            // Try to open the app with custom scheme
+            const customScheme = `flutteredu://course/${courseId}`;
+            window.location.href = customScheme;
+
+            // After 2 seconds, show Play Store link if app didn't open
             setTimeout(() => {
-                document.getElementById('title').textContent = "Didn't open?";
-                document.getElementById('status').textContent = "Tap the button below to open the app";
-                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('subMessage').textContent = 
+                    "App not installed? Download it now!";
+                document.getElementById('storeLink').style.display = 'inline-block';
                 
-                const btn = document.getElementById('openAppBtn');
-                btn.style.display = 'inline-block';
-                btn.onclick = function(e) {
-                    e.preventDefault();
-                    tryOpenApp();
-                };
-                
-                document.getElementById('info').style.display = 'block';
+                // REPLACE WITH YOUR ACTUAL PLAY STORE URL
+                document.getElementById('storeLink').href = 
+                    'https://play.google.com/store/apps/details?id=com.example.flutter_education';
             }, 2000);
+        } else {
+            document.getElementById('subMessage').textContent = 
+                "Invalid link - no course ID found";
         }
     </script>
 </body>
